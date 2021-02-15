@@ -1,6 +1,6 @@
 OWNER := fnikol
 VERSION := 1.0.0
-BINARY := exporter
+BINARY := terminal
 
 OPV := $(OWNER)/$(BINARY):$(VERSION)
 
@@ -17,7 +17,7 @@ build: ## Compile binary to /bin
 .PHONY: docker-build
 docker-build: ## builds docker image (source: Dockerfile)
 	@echo "Build image ${IMAGE}"
-	@docker build -f ./Dockerfile -t $(OPV)  .
+	@docker build -f ./Dockerfile -t $(OPV) .
 
 # Absolutely awesome: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help: ## show this help

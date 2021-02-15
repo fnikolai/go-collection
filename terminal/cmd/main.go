@@ -46,7 +46,7 @@ func main() {
 			},
 		},
 		Before: func(c *cli.Context) error {
-			if err := terminal.SetLogger(c); err != nil {
+			if err := terminal.SetLogger(c.String("verbose"), true); err != nil {
 				return err
 			}
 
