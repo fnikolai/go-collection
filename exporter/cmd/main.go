@@ -11,8 +11,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/fnikolai/go-collection/exporter"
 	"github.com/fnikolai/go-collection/terminal"
+
+	"github.com/fnikolai/go-collection/exporter"
 )
 
 // [{"field": "key1",  "metric": "value1"}, {"field": "key2",  "metric": "value2"}]

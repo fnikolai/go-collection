@@ -1,8 +1,8 @@
-module exporter
+module github.com/fnikolai/go-collection/exporter
 
 go 1.15
 
 require (
-	github.com/fnikolai/go-collection v0.0.0-20210215175629-2f2dee7a699d // indirect
-	github.com/fnikolai/go-collection/exporter v0.0.0-20210215172911-1a42f4f00308 // indirect
+	github.com/sirupsen/logrus v1.7.0 // indirect
+	github.com/urfave/cli/v2 v2.3.0 // indirect
 )
