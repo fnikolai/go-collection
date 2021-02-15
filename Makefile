@@ -18,6 +18,8 @@ log_success = (echo "\x1B[32m>> $1\x1B[39m")
 log_error = (>&2 echo "\x1B[31m>> $1\x1B[39m" && exit 1)
 
 check_docker = @(which docker &>/dev/null ||  $(call log_error, "Error: Docker is not installed"))
+check_go = @(which go &>/dev/null ||  $(call log_error, "Error: Go is not installed"))
+
 check_defined = $(strip $(foreach 1,$1,  $(call __check_defined,$1,$(strip $(value 2)))))
 __check_defined = $(if $(value $1),, $(error Undefined $1$(if $2, ($2))$(if $(value @), required by target `$@')))
 
@@ -31,6 +33,35 @@ help: ## show this help
 #
 # Endpoints
 #
+
+.PHONY: compile
+compile: ## compile binary for a given package (e.g, make compile PACKAGE=terminal)
+	$(call check_go)
+	$(call check_defined, PACKAGE)
+
+	@echo "Compile package ${PACKAGE} to ${PACKAGE}/bin/${PACKAGE}"
+	@mkdir -p ${PACKAGE}/bin
+	@go build -o ${PACKAGE}/bin/${PACKAGE} ${PACKAGE}/cmd/*
+
+.PHONY: compile-all
+compile-all: ## compile binary for all package
+	$(call check_go)
+
+	@echo "Compile binaries for [${PACKAGES}]"
+	@for package in ${PACKAGES}; do                      \
+		$(MAKE) compile package=$${package};       \
+	done
+
+.PHONY: run
+run: ## compiles and runs an example of the package (e.g, make run PACKAGE=terminal)
+	$(call check_defined, PACKAGE)
+
+	@echo "Compile ${PACKAGE}"
+	@$(MAKE) compile package=$${PACKAGE};
+
+	@echo "Run ${PACKAGE} example"
+	@cd ${PACKAGE}/example && ./example.sh
+
 
 .PHONY: docker-build
 docker-build: ## builds docker image for a given package (e.g, make docker-build PACKAGE=terminal)
