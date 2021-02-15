@@ -2,16 +2,15 @@ package terminal
 
 import (
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli/v2"
 )
 
-func SetLogger(c *cli.Context) error {
+func SetLogger(level string, jsonOutput bool) error {
 	//  default configuration
 	log.SetLevel(log.WarnLevel)
 	log.SetFormatter(&log.TextFormatter{})
 
 	// set debug log level
-	switch level := c.String("verbose"); level {
+	switch level := level; level {
 	case "debug", "DEBUG":
 		log.SetLevel(log.DebugLevel)
 	case "info", "INFO":
@@ -29,7 +28,7 @@ func SetLogger(c *cli.Context) error {
 	}
 
 	// set log formatter to JSON
-	if c.Bool("json") {
+	if jsonOutput {
 		log.SetFormatter(&log.JSONFormatter{})
 	}
 

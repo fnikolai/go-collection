@@ -11,11 +11,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/fnikolai/go-collection/terminal"
+
 	"github.com/fnikolai/go-collection/exporter"
 )
 
 // [{"field": "key1",  "metric": "value1"}, {"field": "key2",  "metric": "value2"}]
 func main() {
+	terminal.SetLogger("debug", true)
+
 	addr := flag.String("listen-address", ":9080", "Address on which to expose metrics")
 	filter := flag.String("filter", "{}", "JSON filters for field extraction")
 	flag.Parse()
