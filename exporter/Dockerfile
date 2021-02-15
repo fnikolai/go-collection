@@ -4,7 +4,7 @@
 FROM  golang:1.15.2-alpine AS build
 
 # Build parameters
-ARG Dir="."
+ARG SrcDir="."
 ARG TARGETOS
 ARG TARGETARCH
 
@@ -16,13 +16,14 @@ RUN apk add git
 
 WORKDIR /src
 
-# Feature1: separate download of our dependencies from our build (copy go.mod and go.sum)
-COPY ${Dir}/go.* ./
+# Feature1: separate download of our dependencies from our build
+COPY ./go.* ./
 RUN go mod download
 
-COPY ${Dir} .
 
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/exporter ./cmd
+COPY ${SrcDir} .
+
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/terminal ./cmd
 
 # Feature2: leverage Go's compiler cache using BuildKit's Dockerfile
 #RUN --mount=type=cache,target=/root/.cache/go-build \
@@ -30,10 +31,10 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/exporter ./cmd
 
 # In the second step, copy the compiled binary to another tiny container
 FROM alpine AS bin
-COPY --from=build /bin/exporter /
+COPY --from=build /bin/terminal /
 
-EXPOSE 6666/tcp
+#EXPOSE 6666/tcp
 
 RUN apk add docker
 
-ENTRYPOINT ["./exporter"]
+ENTRYPOINT ["./terminal"]
