@@ -1,4 +1,4 @@
-module github.com/fnikolai/go-collection/terminal
+module terminal
 
 go 1.15
 
