@@ -10,7 +10,7 @@ PACKAGE := $(package)
 OWNER := fnikol
 VERSION := $(shell git rev-parse --short HEAD)	# get the latest commit hash in the short form
 REGISTRY := localhost:5000
-OPV := $(REGISTRY)/$(OWNER)/$(PACKAGE):$(VERSION)
+OPV := $(REGISTRY)/$(OWNER)-$(PACKAGE):$(VERSION)
 
 #
 # Helpers

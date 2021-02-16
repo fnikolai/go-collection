@@ -22,7 +22,7 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 		os.Interrupt,
 	)
 
-	closeDone := make(chan struct{}, 1)
+	closeDone := make(chan struct{})
 	go func() {
 		for {
 			sig := <-signals
@@ -37,7 +37,9 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 			case os.Interrupt, syscall.SIGTERM:
 
 				log.Infof("Got signal [%v] to exit.\n", sig)
-				cancel()
+				if cancel != nil {
+					cancel()
+				}
 
 				select {
 				case <-signals:
@@ -48,11 +50,13 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 				case <-time.After(10 * time.Second):
 					log.Infof("\nWait 10s for closed, force exit\n")
 					os.Exit(1)
-
+/*
 				case <-closeDone:
 					log.Info("Gracefully exited")
 					os.Exit(0)
 					return
+
+ */
 				}
 
 			default:
@@ -66,6 +70,9 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 	}
 
 	// close handlers
-	cancel()
+	if cancel != nil {
+		cancel()
+	}
+
 	closeDone <- struct{}{}
 }

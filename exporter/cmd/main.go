@@ -5,8 +5,6 @@ import (
 	"flag"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
@@ -40,21 +38,16 @@ func main() {
 		log.Fatal(http.ListenAndServe(*addr, nil))
 	}()
 
-	// Read from input and export filtered fields
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		exporter.ApplyFilter(exporter.SpaceStringsBuilder(scanner.Text()))
-	}
 
-	if err := scanner.Err(); err != nil {
-		log.Println(err)
-	}
 
 	log.Println("Press ctrl + c to terminate")
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	terminal.HandleSignals(nil, func() error {
+		// Read from input and export filtered fields
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			exporter.ApplyFilter(exporter.SpaceStringsBuilder(scanner.Text()))
+		}
 
-	select {
-	case <-sigs:
-	}
+		return scanner.Err()
+	})
 }
