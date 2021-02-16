@@ -8,7 +8,7 @@ PACKAGE := $(package)
 # Builder info
 #
 OWNER := fnikol
-VERSION := latest
+VERSION := $(shell git rev-parse --short HEAD)	# get the latest commit hash in the short form
 REGISTRY := localhost:5000
 OPV := $(REGISTRY)/$(OWNER)/$(PACKAGE):$(VERSION)
 
@@ -101,9 +101,9 @@ docker-push: ## builds docker image and pushes it to registry (e.g, PACKAGE=term
 	$(call check_defined, PACKAGE)
 	$(call check_defined, REGISTRY)
 
-	$(MAKE) docker-build 
+	@$(MAKE) docker-build
 
-	echo "Push $(OPV)"
+	@echo "Push $(OPV)"
 	docker push $(OPV)
 
 

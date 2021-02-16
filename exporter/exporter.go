@@ -57,7 +57,7 @@ func CreateFilter(jsonFilters string) error {
 			)
 
 		default:
-			log.Printf("Unknown metric %s for field %s", f.Collector, f.Field)
+			log.Printf("Unknown collector %s for field %s", f.Collector, f.Field)
 			continue
 		}
 
@@ -84,7 +84,7 @@ func ApplyFilter(line string) {
 
 	filter := func(key, value string) {
 		// validate key
-		metric, ok := collectors[key]
+		collector, ok := collectors[key]
 		if !ok {
 			return
 		}
@@ -96,8 +96,8 @@ func ApplyFilter(line string) {
 			return
 		}
 
-		// update metric with value
-		switch v := metric.(type) {
+		// update collector with value
+		switch v := collector.(type) {
 		case prometheus.Gauge:
 			v.Set(val)
 		case prometheus.Counter:
