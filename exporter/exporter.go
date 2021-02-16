@@ -16,6 +16,8 @@ var KVDelimiter = ":"
 
 func CreateFilter(jsonFilters string) error {
 
+	log.Print("dasdsa 3")
+
 	type filter struct {
 		Field     string `json:"field"`
 		Collector string `json:"collector"`

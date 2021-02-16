@@ -11,15 +11,12 @@ ARG TARGETARCH
 # Execution parameters
 ENV CGO_ENABLED=0
 
-# Add git to download dependencies
-RUN apk add git
-
 WORKDIR /src
 
 # Feature1: separate download of our dependencies from our build
+# Depending on the builder, git may need to be install
 COPY ./go.* ./
 RUN go mod download
-
 
 COPY ${SrcDir} .
 
@@ -27,7 +24,8 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/exporter ./cmd
 
 # Feature2: leverage Go's compiler cache using BuildKit's Dockerfile
 #RUN --mount=type=cache,target=/root/.cache/go-build \
-#GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/timon ./cmd
+#    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/exporter ./cmd
+
 
 # In the second step, copy the compiled binary to another tiny container
 FROM alpine AS bin

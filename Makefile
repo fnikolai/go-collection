@@ -8,9 +8,10 @@ PACKAGE := $(package)
 # Builder info
 #
 OWNER := fnikol
-VERSION := $(shell git rev-parse --short HEAD)	# get the latest commit hash in the short form
+#VERSION := $(shell git rev-parse --short HEAD)	# get the latest commit hash in the short form
+VERSION := latest
 REGISTRY := localhost:5000
-OPV := $(REGISTRY)/$(OWNER)-$(PACKAGE):$(VERSION)
+OPV := $(REGISTRY)/$(PACKAGE):$(VERSION)
 
 #
 # Helpers
@@ -53,8 +54,8 @@ compile-all: ## compile binary for all package
 		$(MAKE) compile package=$${package};       \
 	done
 
-.PHONY: run
-run: ## compiles and runs an example of the package (e.g, make run PACKAGE=terminal)
+.PHONY: testrun
+testrun: ## compiles and runs an example of the package (e.g, make run PACKAGE=terminal)
 	$(call check_defined, PACKAGE)
 
 	@echo "Compile ${PACKAGE}"
