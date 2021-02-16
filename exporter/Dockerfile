@@ -23,7 +23,7 @@ RUN go mod download
 
 COPY ${SrcDir} .
 
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/terminal ./cmd
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/exporter ./cmd
 
 # Feature2: leverage Go's compiler cache using BuildKit's Dockerfile
 #RUN --mount=type=cache,target=/root/.cache/go-build \
@@ -31,10 +31,8 @@ RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/terminal ./cmd
 
 # In the second step, copy the compiled binary to another tiny container
 FROM alpine AS bin
-COPY --from=build /bin/terminal /
+COPY --from=build /bin/exporter /
 
 #EXPOSE 6666/tcp
 
-RUN apk add docker
-
-ENTRYPOINT ["./terminal"]
+ENTRYPOINT ["./exporter"]

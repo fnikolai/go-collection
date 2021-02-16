@@ -8,8 +8,9 @@ PACKAGE := $(package)
 # Builder info
 #
 OWNER := fnikol
-VERSION := 1.0.0
-OPV := $(OWNER)/$(PACKAGE):$(VERSION)
+VERSION := latest
+REGISTRY := localhost:5000
+OPV := $(REGISTRY)/$(OWNER)/$(PACKAGE):$(VERSION)
 
 #
 # Helpers
@@ -68,7 +69,7 @@ docker-build: ## builds docker image for a given package (e.g, make docker-build
 	$(call check_docker)
 	$(call check_defined, PACKAGE)
 
-	@echo "Build image ${PACKAGE}"
+	@echo "Build package ${PACKAGE}"
 	@docker build -f ./${PACKAGE}/Dockerfile -t $(OPV) --build-arg SrcDir=${PACKAGE} .
 
 
@@ -79,7 +80,7 @@ docker-build-all: ## builds docker images for all package
 	@echo "Build images [${PACKAGES}]"
 	for package in ${PACKAGES}; do                      \
 		echo "* $${package}";             			\
-		$(MAKE) docker-build image=$${package};       \
+		$(MAKE) docker-build package=$${package};       \
 	done
 
 
@@ -96,8 +97,13 @@ docker-test-cli: ## runs container in foreground, override entrypoint to use use
 
 
 .PHONY: docker-push
-docker-push: ## pushes to docker hub
-	$(call check_docker)
+docker-push: ## builds docker image and pushes it to registry (e.g, PACKAGE=terminal, REGISTRY=localhost:5000)
+	$(call check_defined, PACKAGE)
+	$(call check_defined, REGISTRY)
+
+	$(MAKE) docker-build 
+
+	echo "Push $(OPV)"
 	docker push $(OPV)
 
 

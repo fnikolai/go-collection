@@ -20,7 +20,7 @@ import (
 func main() {
 	terminal.SetLogger("debug", true)
 
-	addr := flag.String("listen-address", ":9080", "Address on which to expose metrics")
+	addr := flag.String("listen-address", ":9443", "Address on which to expose metrics")
 	filter := flag.String("filter", "{}", "JSON filters for field extraction")
 	flag.Parse()
 

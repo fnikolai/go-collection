@@ -35,6 +35,4 @@ COPY --from=build /bin/terminal /
 
 #EXPOSE 6666/tcp
 
-RUN apk add docker
-
 ENTRYPOINT ["./terminal"]

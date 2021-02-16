@@ -10,15 +10,15 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var metrics = map[string]interface{}{}
+var collectors = map[string]interface{}{}
 var PairDelimiter = ","
 var KVDelimiter = ":"
 
 func CreateFilter(jsonFilters string) error {
 
 	type filter struct {
-		Field  string `json:"field"`
-		Metric string `json:"metric"`
+		Field     string `json:"field"`
+		Collector string `json:"collector"`
 	}
 
 	var filters []filter
@@ -28,29 +28,42 @@ func CreateFilter(jsonFilters string) error {
 
 	// create and register Prometheus Collectors
 	for _, f := range filters {
-		switch f.Metric {
+		var collector prometheus.Collector
+		switch f.Collector {
 		case "gauge":
-			metric := prometheus.NewGauge(prometheus.GaugeOpts{
+			collector = prometheus.NewGauge(prometheus.GaugeOpts{
 				Name: f.Field,
 			})
-			prometheus.MustRegister(metric)
-			metrics[f.Field] = metric
-
-			log.Print("register gauge for field ", f.Field)
 
 		case "counter":
-			metric := prometheus.NewCounter(
+			collector = prometheus.NewCounter(
 				prometheus.CounterOpts{
 					Name: f.Field,
 				},
 			)
-			prometheus.MustRegister(metric)
-			metrics[f.Field] = metric
 
-			log.Print("register counter for field ", f.Field)
+		case "histogram":
+			collector = prometheus.NewHistogram(
+				prometheus.HistogramOpts{
+					Name: f.Field,
+				},
+			)
+
+		case "summary":
+			collector = prometheus.NewSummary(
+				prometheus.SummaryOpts{
+					Name: f.Field,
+				},
+			)
+
 		default:
-			log.Printf("Unknown metric %s for field %s", f.Metric, f.Field)
+			log.Printf("Unknown metric %s for field %s", f.Collector, f.Field)
+			continue
 		}
+
+		prometheus.MustRegister(collector)
+		collectors[f.Field] = collector
+		log.Printf("register %s collector for field %s", f.Collector, f.Field)
 	}
 
 	return nil
@@ -71,7 +84,7 @@ func ApplyFilter(line string) {
 
 	filter := func(key, value string) {
 		// validate key
-		metric, ok := metrics[key]
+		metric, ok := collectors[key]
 		if !ok {
 			return
 		}
@@ -89,6 +102,10 @@ func ApplyFilter(line string) {
 			v.Set(val)
 		case prometheus.Counter:
 			v.Add(val)
+		case prometheus.Histogram:
+			v.Observe(val)
+		case prometheus.Summary:
+			v.Observe(val)
 		}
 	}
 
