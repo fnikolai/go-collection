@@ -2,12 +2,12 @@ package exporter
 
 import (
 	"encoding/json"
-	"log"
 	"strconv"
 	"strings"
 	"unicode"
 
 	"github.com/prometheus/client_golang/prometheus"
+	log "github.com/sirupsen/logrus"
 )
 
 var collectors = map[string]interface{}{}
@@ -57,7 +57,7 @@ func CreateFilter(jsonFilters string) error {
 			)
 
 		default:
-			log.Printf("Unknown collector %s for field %s", f.Collector, f.Field)
+			log.Warnf("Unknown collector %s for field %s", f.Collector, f.Field)
 			continue
 		}
 

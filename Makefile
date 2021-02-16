@@ -101,7 +101,7 @@ docker-push: ## builds docker image and pushes it to registry (e.g, PACKAGE=term
 	$(call check_defined, PACKAGE)
 	$(call check_defined, REGISTRY)
 
-	@$(MAKE) docker-build
+	$(MAKE) docker-build package=${PACKAGE}
 
 	@echo "Push $(OPV)"
 	docker push $(OPV)
