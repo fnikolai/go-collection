@@ -18,7 +18,8 @@ WORKDIR /src
 COPY ./go.* ./
 RUN go mod download
 
-COPY ${SrcDir} .
+COPY . .
+WORKDIR /src/${SrcDir}
 
 RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /bin/exporter ./cmd
 

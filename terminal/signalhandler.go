@@ -22,7 +22,6 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 		os.Interrupt,
 	)
 
-	log.Print("SKATA")
 	closeDone := make(chan struct{})
 	go func() {
 		for {
