@@ -14,10 +14,14 @@ var collectors = map[string]interface{}{}
 var PairDelimiter = ","
 var KVDelimiter = ":"
 
+// CreateFilter generates filters according to the specific format.
+// If metric is undefined, then it takes the value of Field. Practically, Metric is used for renaming
+// erroneous fields like 99th(us)
 func CreateFilter(jsonFilters string) error {
 
 	type filter struct {
 		Field     string `json:"field"`
+		Metric     string `json:"metric"`
 		Collector string `json:"collector"`
 	}
 
@@ -28,31 +32,41 @@ func CreateFilter(jsonFilters string) error {
 
 	// create and register Prometheus Collectors
 	for _, f := range filters {
+
+		if f.Field == "" || f.Collector == "" {
+			log.Warn("Invalid filter ", f)
+			continue
+		}
+
+		if f.Metric == "" {
+			f.Metric = f.Field
+		}
+
 		var collector prometheus.Collector
 		switch f.Collector {
 		case "gauge":
 			collector = prometheus.NewGauge(prometheus.GaugeOpts{
-				Name: f.Field,
+				Name: f.Metric,
 			})
 
 		case "counter":
 			collector = prometheus.NewCounter(
 				prometheus.CounterOpts{
-					Name: f.Field,
+					Name: f.Metric,
 				},
 			)
 
 		case "histogram":
 			collector = prometheus.NewHistogram(
 				prometheus.HistogramOpts{
-					Name: f.Field,
+					Name: f.Metric,
 				},
 			)
 
 		case "summary":
 			collector = prometheus.NewSummary(
 				prometheus.SummaryOpts{
-					Name: f.Field,
+					Name: f.Metric,
 				},
 			)
 
@@ -63,7 +77,7 @@ func CreateFilter(jsonFilters string) error {
 
 		prometheus.MustRegister(collector)
 		collectors[f.Field] = collector
-		log.Printf("register %s collector for field %s", f.Collector, f.Field)
+		log.Printf("register %s collector (%s) for field %s", f.Collector, f.Metric, f.Field)
 	}
 
 	return nil
