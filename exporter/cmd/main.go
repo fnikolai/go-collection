@@ -30,14 +30,12 @@ func main() {
 		log.Fatal("filter creation failed ", err)
 	}
 
-	// The Handler function provides a default handler to expose metrics
+	// The handler function provides a default handler to expose metrics
 	// via an HTTP server. "/metrics" is the usual endpoint for that.
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 		log.Fatal(http.ListenAndServe(*addr, nil))
 	}()
-
-
 
 	log.Println("Press ctrl + c to terminate")
 	terminal.HandleSignals(nil, func() error {

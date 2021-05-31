@@ -1,7 +1,7 @@
 #
 # Packages
 #
-PACKAGES := exporter terminal
+PACKAGES := exporter terminal ycsb-prometheus
 PACKAGE := $(package)
 
 #

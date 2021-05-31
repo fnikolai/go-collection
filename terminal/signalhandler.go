@@ -22,7 +22,7 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 		os.Interrupt,
 	)
 
-	closeDone := make(chan struct{})
+	closeDone := make(chan struct{}, 1)
 	go func() {
 		for {
 			sig := <-signals
@@ -48,8 +48,8 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 					log.Infof("\nGot signal [%v] again to exit.\n", sig)
 					os.Exit(1)
 
-				case <-time.After(10 * time.Second):
-					log.Infof("\nWait 10s for closed, force exit\n")
+				case <-time.After(1 * time.Minute):
+					log.Infof("\nWait 1m for closed, force exit\n")
 					os.Exit(124)
 
 					/*
@@ -76,3 +76,25 @@ func HandleSignals(cancel context.CancelFunc, cb func() error) {
 
 	closeDone <- struct{}{}
 }
+
+/*
+// Start starts the kubewatch controller
+func (c *Backend) Start(stopCh <-chan struct{}) {
+	defer utilruntime.HandleCrash()
+	defer c.queue.ShutDown()
+
+	c.logger.Info("Starting kubewatch controller")
+	serverStartTime = time.Now().Local()
+
+	go c.informer.Start(stopCh)
+
+	if !cache.WaitForCacheSync(stopCh, c.HasSynced) {
+		utilruntime.HandleError(fmt.Errorf("Timed out waiting for caches to sync"))
+		return
+	}
+
+	c.logger.Info("Kubewatch controller synced and ready")
+
+	wait.Until(c.runWorker, time.Second, stopCh)
+}
+*/
